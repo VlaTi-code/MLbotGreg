@@ -37,6 +37,23 @@ class UserKeyboards:
         return kb
 
     @staticmethod
+    def interior_choose_plan() -> InlineKeyboardMarkup:
+        kb = InlineKeyboardMarkup(
+            inline_keyboard=[
+                [InlineKeyboardButton(text=buttons['interior_standard'],
+                                      callback_data=callbacks[buttons['interior_standard']])],
+                [InlineKeyboardButton(text=buttons['interior_pro'],
+                                      callback_data=callbacks[buttons['interior_pro']])],
+                [InlineKeyboardButton(text=buttons['interior_premium'],
+                                      callback_data=callbacks[buttons['interior_premium']])],
+                [InlineKeyboardButton(text=buttons['back_to_menu'],
+                                      callback_data=callbacks[buttons['back_to_menu']])]
+            ]
+        )
+
+        return kb
+
+    @staticmethod
     def dress_up_regime() -> InlineKeyboardMarkup:
         kb = InlineKeyboardMarkup(
             inline_keyboard=[
@@ -46,6 +63,45 @@ class UserKeyboards:
                                       callback_data=callbacks[buttons['dress_up_choose_plan']])],
                 [InlineKeyboardButton(text=buttons['back_to_menu'],
                                       callback_data=callbacks[buttons['back_to_menu']])]
+            ]
+        )
+
+        return kb
+
+    @staticmethod
+    def dress_up_choose_plan() -> InlineKeyboardMarkup:
+        kb = InlineKeyboardMarkup(
+            inline_keyboard=[
+                [InlineKeyboardButton(text=buttons['dress_up_standard'],
+                                      callback_data=callbacks[buttons['dress_up_standard']])],
+                [InlineKeyboardButton(text=buttons['dress_up_pro'],
+                                      callback_data=callbacks[buttons['dress_up_pro']])],
+                [InlineKeyboardButton(text=buttons['dress_up_premium'],
+                                      callback_data=callbacks[buttons['dress_up_premium']])],
+                [InlineKeyboardButton(text=buttons['back_to_menu'],
+                                      callback_data=callbacks[buttons['back_to_menu']])]
+            ]
+        )
+
+        return kb
+
+    @staticmethod
+    def creating_model() -> InlineKeyboardMarkup:
+        kb = InlineKeyboardMarkup(
+            inline_keyboard=[
+                [InlineKeyboardButton(text=buttons['back_to_menu'],
+                                      callback_data=callbacks[buttons['back_to_menu']])],
+            ]
+        )
+
+        return kb
+
+    @staticmethod
+    def choosing_model(models_list) -> InlineKeyboardMarkup:
+        kb = InlineKeyboardMarkup(
+            inline_keyboard=[
+                [InlineKeyboardButton(text=model, callback_data=f"model_{model}")]
+                for model in models_list
             ]
         )
 

@@ -22,16 +22,25 @@ LEXICON: dict[str, str | list[str]] = {
     'interior_new_model_enter_photos_failed_not_enough_photos': 'Недостаточно фотографий, пожалуйста, '
                                                                 'прикрепите 7-10 фото к одному сообщению и '
                                                                 'отправьте боту для обучения',
+    'interior_gen_with_existing_model': 'Выберите модель с которой вы будете генерировать фотографии:',
+    'interior_choose_plan': '<b>Выберите план:</b>\n\n'
+                            '<b>Interior Standard:</b> 3 обучения модели + 30 генераций - 2199р\n'
+                            '<b>Interior Pro:</b> 5 обучений модели + 50 генераций - 3199р\n'
+                            '<b>Interior Premium:</b> 10 обучений модели + 100 генераций - 5999р\n',
 
     'dress_up_regime_intro': '<b>Как это работает?</b>\n\n'
-                            'Вы можете легко посмотреть, как выглядит предмет одежды на любом человеке!\n'
-                            'Механизм работы прост:'
-                            '1. Вы отправляете нам 2 фотографии: предмета одежды и человека, '
-                            'на которого вы хотите примерить одежду\n'
-                            '2. Мы возвращаем вам результат примерки\n\n'
-                            'Вам доступно 20 пробных генераций:',
+                             'Вы можете легко посмотреть, как выглядит предмет одежды на любом человеке!\n'
+                             'Механизм работы прост:'
+                             '1. Вы отправляете нам 2 фотографии: предмета одежды и человека, '
+                             'на которого вы хотите примерить одежду\n'
+                             '2. Мы возвращаем вам результат примерки\n\n'
+                             'Вам доступно 20 пробных генераций:',
+    'dress_up_choose_plan': '<b>Выберите план:</b>\n\n'
+                            '<b>Dress up Standard:</b> 50 генераций в месяц - 700р\n'
+                            '<b>Dress up Pro:</b> 100 генераций в месяц - 1000р\n'
+                            '<b>Dress up Premium:</b> 300 генераций в месяц - 2500р\n',
 
-    'help': 'Обратиться за помощью: @IT4shnik'
+    'help': 'Обратиться за помощью: <code>{}</code>'
 }
 
 buttons: dict[str, str] = {
@@ -40,9 +49,17 @@ buttons: dict[str, str] = {
     'interior_gen_with_existing_model': 'Сгенерировать изображение с существующей моделью',
     'interior_choose_plan': 'Выбрать тариф',
 
+    'interior_standard': 'Interior Standard',
+    'interior_pro': 'Interior Pro',
+    'interior_premium': 'Interior Premium',
+
     'dress_up_regime': 'Примерить одежду',
     'dress_up_new_gen': 'Сгенерировать изображение',
     'dress_up_choose_plan': 'Выбрать тариф',
+
+    'dress_up_standard': 'Dress up Standard',
+    'dress_up_pro': 'Dress up Pro',
+    'dress_up_premium': 'Dress up Premium',
 
     'back_to_menu': 'Назад в меню',
     'help': 'Помощь',
@@ -54,9 +71,17 @@ callbacks: dict[str, str] = {
     buttons['interior_gen_with_existing_model']: 'interior_gen_with_existing_model_button',
     buttons['interior_choose_plan']: 'interior_choose_plan_button',
 
+    buttons['interior_standard']: 'interior_standard_button',
+    buttons['interior_pro']: 'interior_pro_button',
+    buttons['interior_premium']: 'interior_premium_button',
+
     buttons['dress_up_regime']: 'dress_up_regime_button',
     buttons['dress_up_new_gen']: 'dress_up_new_gen_button',
     buttons['dress_up_choose_plan']: 'choose_plan_button',
+
+    buttons['dress_up_standard']: 'dress_up_standard_button',
+    buttons['dress_up_pro']: 'dress_up_pro_button',
+    buttons['dress_up_premium']: 'dress_up_premium_button',
 
     buttons['back_to_menu']: 'back_to_menu_button',
     buttons['help']: 'help_button',

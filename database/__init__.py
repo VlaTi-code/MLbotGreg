@@ -1,6 +1,6 @@
-from .db_models import Base, User, Event, Registration, BeerPongTeam
-from .database import DataBase
+from .db_models import Base, User, Plan, UserPlan, UserModel, DailyRequests
+from .database import Database
 
 from core import DATABASE_URL
 
-db: DataBase = DataBase(DATABASE_URL)
+db: Database = Database()
