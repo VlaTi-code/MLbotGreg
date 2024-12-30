@@ -1,5 +1,5 @@
 LEXICON: dict[str, str | list[str]] = {
-    'start': '<b>Генератор фото с ИИ LORA AI</b>\n\n'
+    'start': '<b>Генератор фото с LORA AI</b>\n\n'
              'Представьте, что вы можете встроить любой предмет в любой интерьер или посмотреть, '
              'как выглядит любой предмет одежды на любом человеке.\n\n'
              'LORA воплощает это в жизнь!\n\n'
@@ -7,13 +7,15 @@ LEXICON: dict[str, str | list[str]] = {
     'interior_regime_intro': '<b>Как это работает?</b>\n\n'
                              '1. Вы создаете модель и называете ее как предмет, '
                              'с которым вы собираетесь генерировать изображения '
-                             '(например: белый стул - White сhair, спортивная сумка - Sports bag)\n'
+                             '(например: белый стул - White сhair, спортивная сумка - Sports bag)\n\n'
                              '2. Вы загружаете от 7 до 10 фотографий предмета <b>одним сообщением</b>. '
-                             'После этого начинается процесс обучения модели (от 10 до 20 минут)'
+                             'После этого начинается процесс обучения модели (от 10 до 20 минут)\n\n'
                              '3. Когда модель обучена, вы можете генерировать '
                              'изображения с этим предметов по вашему запросу! '
                              '(например "<b>White chair</b> in the center of the dining room" или '
-                             '"<b>Sports bag</b> lies on a lounger near the swimming pool")',
+                             '"<b>Sports bag</b> lies on a lounger near the swimming pool")\n\n'
+                             '<b>Осталось моделей: {}</b>\n'
+                             '<b>Осталось генераций: {}</b>',
     'interior_new_model_enter_model_name': '<b>Напишите название новой модели</b>',
     'interior_new_model_enter_photos': 'Отлично! Теперь загрузите от <b>7 до 10 фотографий</b> '
                                        'предмета для обучения модели <code>{}</code> <b>одним сообщением</b>',
@@ -32,9 +34,9 @@ LEXICON: dict[str, str | list[str]] = {
                              'Вы можете легко посмотреть, как выглядит предмет одежды на любом человеке!\n'
                              'Механизм работы прост:'
                              '1. Вы отправляете нам 2 фотографии: предмета одежды и человека, '
-                             'на которого вы хотите примерить одежду\n'
+                             'на которого вы хотите примерить одежду\n\n'
                              '2. Мы возвращаем вам результат примерки\n\n'
-                             'Вам доступно 20 пробных генераций:',
+                             '<b>Осталось генераций: {}</b>',
     'dress_up_choose_plan': '<b>Выберите план:</b>\n\n'
                             '<b>Dress up Standard:</b> 50 генераций в месяц - 700р\n'
                             '<b>Dress up Pro:</b> 100 генераций в месяц - 1000р\n'
@@ -46,7 +48,8 @@ LEXICON: dict[str, str | list[str]] = {
 buttons: dict[str, str] = {
     'interior_regime': 'Встроить предмет в интерьер',
     'interior_new_model': 'Создать новую модель',
-    'interior_gen_with_existing_model': 'Сгенерировать изображение с существующей моделью',
+    'interior_creating_model_continue': 'Создать модель',
+    'interior_gen_with_existing_model': 'Сгенерировать с обученной моделью',
     'interior_choose_plan': 'Выбрать тариф',
 
     'interior_standard': 'Interior Standard',
@@ -68,6 +71,7 @@ buttons: dict[str, str] = {
 callbacks: dict[str, str] = {
     buttons['interior_regime']: 'interior_regime_button',
     buttons['interior_new_model']: 'interior_new_model_button',
+    buttons['interior_creating_model_continue']: 'interior_creating_model_continue_button',
     buttons['interior_gen_with_existing_model']: 'interior_gen_with_existing_model_button',
     buttons['interior_choose_plan']: 'interior_choose_plan_button',
 

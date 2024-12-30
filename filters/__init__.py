@@ -1,1 +1,1 @@
-from filters.filters import IsNotDefault, IsChoosingModel, IsChoosingPlan
+from filters.filters import IsNotDefault, IsChoosingModel, IsChoosingPlan, IsWaitingForPhotos

@@ -27,3 +27,8 @@ class IsChoosingPlan(Filter):
     async def __call__(self, message: Message, state: FSMContext, *args, **kwargs):
         state_value = await state.get_state()
         return state_value == UserState.choosing_plan
+
+class IsWaitingForPhotos(Filter):
+    async def __call__(self, message: Message, state: FSMContext, *args, **kwargs):
+        state_value = await state.get_state()
+        return state_value == UserState.waiting_for_photos

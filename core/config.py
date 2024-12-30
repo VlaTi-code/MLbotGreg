@@ -20,40 +20,75 @@ from aiogram.filters import StateFilter
 from states import UserState
 
 
-class AntiSpamMiddleware(BaseMiddleware):
-    """Middleware для обработки медиа-групп."""
-
-    def __init__(self, latency: float = 0.5):
-        """
-        latency - время ожидания завершения группы.
-        """
-        super().__init__()
-        self.album_data = {}
-        self.latency = latency
-
-    async def __call__(self, handler: Callable, event: Message, data: Dict[str, Any]):
-        if not event.media_group_id:
-            # Если сообщение не принадлежит группе, сразу передаём управление
-            return await handler(event, data)
-
-        media_group_id = event.media_group_id
-
-        # Сохраняем сообщение в группе
-        if media_group_id not in self.album_data:
-            self.album_data[media_group_id] = []
-
-        self.album_data[media_group_id].append(event)
-
-        # Ожидаем завершения медиа-группы
-        await asyncio.sleep(self.latency)
-
-        # Если группа завершена, передаём весь альбом в хендлер
-        if media_group_id in self.album_data:
-            data["album"] = self.album_data.pop(media_group_id)
-            return await handler(event, data)
-
-
-
+# class AntiSpamMiddleware(BaseMiddleware):
+#     """Middleware для обработки медиа-групп."""
+#
+#     def __init__(self, latency: float = 0.5):
+#         """
+#         latency - время ожидания завершения группы.
+#         """
+#         super().__init__()
+#         self.album_data = {}
+#         self.latency = latency
+#
+#     async def __call__(self, handler: Callable, event: Message, data: Dict[str, Any]):
+#         if not event.media_group_id:
+#             # Если сообщение не принадлежит группе, сразу передаём управление
+#             return await handler(event, data)
+#
+#         media_group_id = event.media_group_id
+#
+#         # Сохраняем сообщение в группе
+#         if media_group_id not in self.album_data:
+#             self.album_data[media_group_id] = []
+#
+#         self.album_data[media_group_id].append(event)
+#
+#         # Ожидаем завершения медиа-группы
+#         await asyncio.sleep(self.latency)
+#
+#         # Если группа завершена
+#         if media_group_id in self.album_data:
+#             album = self.album_data.pop(media_group_id)
+#
+#             # Проверяем, что количество фотографий >= 7
+#             if len(album) < 7:
+#                 await event.answer("Фотографий недостаточно. Нужно отправить не менее 7 фотографий.")
+#                 return  # Прерываем обработку
+#
+#             # Передаём альбом в хэндлер
+#             data["album"] = album
+#             return await handler(event, data)
+#
+#
+#
+#     async def _schedule_handler(self, handler: Callable, media_group_id: str, data: Dict[str, Any]):
+#         """
+#         Задача, которая «ждёт» ещё сообщений в группу, а затем один раз вызывает хендлер.
+#         """
+#         await asyncio.sleep(self.latency)
+#
+#         group_data = self.album_data.get(media_group_id)
+#         # Могли успеть удалить из словаря, если что-то пошло не так
+#         if not group_data:
+#             return
+#
+#         # Если по каким-то причинам уже вызвали (handled = True), выходим
+#         if group_data["handled"]:
+#             return
+#
+#         group_data["handled"] = True
+#
+#         # Собираем все сообщения и передаём их в хендлер
+#         messages = group_data["messages"]
+#         data["album"] = messages
+#
+#         # Вызываем ваш хендлер, передавая **последнее** сообщение как event
+#         # (чтобы в нём были актуальные from_user, chat, и т. д.)
+#         await handler(messages[-1], data)
+#
+#         # Удаляем группу из словаря, чтобы не копить ненужные данные
+#         self.album_data.pop(media_group_id, None)
 
 
 @dataclass
@@ -102,6 +137,7 @@ bot: Bot = Bot(token=config.tg_bot.token, default=default)
 
 redis = Redis(host='localhost')
 storage = RedisStorage(redis=redis)
+
 dp: Dispatcher = Dispatcher()
 
 DATABASE_URL = (

@@ -6,7 +6,6 @@ class UserState(StatesGroup):
 
     waiting_for_model_name = State()
     waiting_for_photos = State()
-    waiting_for_correct_photos = State()
 
     choosing_model = State()
 

@@ -44,10 +44,10 @@ class UserModel(Base):
     files_id = Column(String, nullable=False)
 
 
-class DailyRequests(Base):
-    __tablename__ = 'daily_requests'
-    id = Column(BigInteger, primary_key=True, autoincrement=True)        # Уникальный идентификатор запроса
-    user_id = Column(BigInteger, ForeignKey('users.user_id'), nullable=False)  # Уникальный идентификатор пользователя
-    date = Column(DateTime, default=datetime.utcnow) # Дата создания запроса
-    model_type = Column(Enum('interior', 'dress_up', name='plan_type_enum'), nullable=False) # Тип модели
+class MonthlyRequests(Base):
+    __tablename__ = 'monthly_requests'
+    id = Column(BigInteger, primary_key=True, autoincrement=True)
+    user_id = Column(BigInteger, ForeignKey('users.user_id'), nullable=False)
+    date = Column(DateTime, default=datetime.utcnow)
+    model_type = Column(Enum('interior', 'dress_up', name='plan_type_enum'), nullable=False)
     request_type = Column(Enum('learning', 'generation', name='request_type_enum'), nullable=False)

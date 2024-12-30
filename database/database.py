@@ -6,9 +6,10 @@ from sqlalchemy.orm import sessionmaker
 from sqlalchemy.future import select
 from sqlalchemy import create_engine
 from sqlalchemy import select, func
+from datetime import datetime
 
 from core.config import DATABASE_URL, config
-from .db_models import Base, User, Plan, UserPlan, UserModel
+from .db_models import Base, User, Plan, UserPlan, UserModel, MonthlyRequests
 
 
 plans = {
@@ -198,7 +199,7 @@ class Database:
         """
         Получить user_id по username.
 
-        :param username: Имя пользователя.
+        :param username: имя пользователя в Telegram.
         :return: user_id или None, если пользователь не найден.
         """
         async with self.async_session() as session:
@@ -222,6 +223,8 @@ class Database:
     async def add_user(self, username: str):
         """
         Асинхронное добавление нового пользователя в базу данных.
+
+        :param username: имя пользователя в Telegram.
         """
         async with self.async_session() as session:
             try:
@@ -323,3 +326,211 @@ class Database:
             except Exception as e:
                 print(f"Ошибка при получении моделей для пользователя {user_id}: {e}")
                 return []
+
+
+    async def get_user_requests_count(self, user_id: int) -> dict:
+        """
+        Возвращает количество запросов по каждому типу (learning / generation)
+        для обоих model_type (interior / dress_up) пользователя с заданным user_id.
+
+        Пример структуры возвращаемого словаря:
+        {
+          "interior": {
+            "learning": 3,
+            "generation": 10
+          },
+          "dress_up": {
+            "learning": 0,
+            "generation": 5
+          }
+        }
+        """
+        async with self.async_session() as session:
+            result = await session.execute(
+                select(
+                    MonthlyRequests.model_type,
+                    MonthlyRequests.request_type,
+                    func.count()
+                )
+                .where(MonthlyRequests.user_id == user_id)
+                .group_by(MonthlyRequests.model_type, MonthlyRequests.request_type)
+            )
+            rows = result.all()
+
+        summary = {
+            "interior": {
+                "learning": 0,
+                "generation": 0
+            },
+            "dress_up": {
+                "learning": 0,
+                "generation": 0
+            }
+        }
+
+        for (model_type, request_type, count_val) in rows:
+            if model_type == "interior":
+                if request_type == "learning":
+                    summary["interior"]["learning"] += count_val
+                elif request_type == "generation":
+                    summary["interior"]["generation"] += count_val
+
+            elif model_type == "dress_up":
+                if request_type == "learning":
+                    summary["dress_up"]["learning"] += count_val
+                elif request_type == "generation":
+                    summary["dress_up"]["generation"] += count_val
+
+        return summary
+
+    async def add_request(self, user_id: int, model_type: str, request_type: str):
+        """
+        Добавить новую запись (обращение) в таблицу monthly_requests.
+
+        :param user_id: идентификатор пользователя
+        :param model_type: 'interior' или 'dress_up'
+        :param request_type: 'learning' или 'generation'
+        """
+        async with self.async_session() as session:
+            try:
+                new_request = MonthlyRequests(
+                    user_id=user_id,
+                    model_type=model_type,
+                    request_type=request_type,
+                    date=datetime.utcnow()  # Можно не указывать явно, т.к. есть default= в модели
+                )
+                session.add(new_request)
+                await session.commit()
+                await session.refresh(new_request)
+
+                print(f"Новая запись в monthly_requests: user_id={user_id}, "
+                      f"model_type={model_type}, request_type={request_type}")
+                return new_request
+            except Exception as e:
+                await session.rollback()
+                print(f"Ошибка при добавлении записи в monthly_requests: {e}")
+
+    async def get_user_request_count(self, user_id: int) -> dict:
+        """
+        Возвращает количество запросов по каждому типу (learning / generation)
+        для обоих model_type (interior / dress_up) пользователя с заданным user_id.
+
+        Пример структуры:
+        {
+          "interior": {
+            "learning": 3,
+            "generation": 10
+          },
+          "dress_up": {
+            "learning": 0,
+            "generation": 5
+          }
+        }
+        """
+        async with self.async_session() as session:
+            # Группируем по model_type и request_type
+            result = await session.execute(
+                select(
+                    MonthlyRequests.model_type,
+                    MonthlyRequests.request_type,
+                    func.count()
+                )
+                .where(MonthlyRequests.user_id == user_id)
+                .group_by(MonthlyRequests.model_type, MonthlyRequests.request_type)
+            )
+            rows = result.all()
+
+        # Заранее формируем структуру для счётчиков
+        summary = {
+            "interior": {
+                "learning": 0,
+                "generation": 0
+            },
+            "dress_up": {
+                "learning": 0,
+                "generation": 0
+            }
+        }
+
+        # Заполняем словарь по полученным данным
+        for (model_type, request_type, count_val) in rows:
+            if model_type == "interior":
+                if request_type == "learning":
+                    summary["interior"]["learning"] += count_val
+                elif request_type == "generation":
+                    summary["interior"]["generation"] += count_val
+
+            elif model_type == "dress_up":
+                if request_type == "learning":
+                    summary["dress_up"]["learning"] += count_val
+                elif request_type == "generation":
+                    summary["dress_up"]["generation"] += count_val
+
+        return summary
+
+    async def get_user_plan_limits(self, user_id: int) -> dict:
+        """
+        Возвращает суммарные лимиты по обучению (training_limit) и генерации (generation_limit)
+        для обоих model_type ('interior' и 'dress_up') у заданного user_id,
+        НЕ вычитая уже израсходованное.
+
+        Пример возвращаемой структуры:
+        {
+          "interior": {
+            "learning": 0,      # Или любое суммарное число
+            "generation": 0
+          },
+          "dress_up": {
+            "learning": 0,
+            "generation": 0
+          }
+        }
+
+        Если планов нужного типа нет, значения будут по умолчанию 0.
+        """
+
+        async with self.async_session() as session:
+            now = datetime.utcnow()
+
+            # Получаем все активные планы пользователя
+            # При необходимости можно убрать проверку дат (start_date, end_date),
+            # если не учитывается срок действия.
+            stmt = (
+                select(
+                    Plan.plan_type,
+                    Plan.training_limit,
+                    Plan.generation_limit
+                )
+                .join(UserPlan, Plan.plan_id == UserPlan.plan_id)
+                .where(
+                    UserPlan.user_id == user_id,
+                    UserPlan.is_active == True,
+                    UserPlan.start_date <= now,
+                    UserPlan.end_date >= now
+                )
+            )
+            result = await session.execute(stmt)
+            rows = result.all()
+
+        # Готовим структуру для суммирования
+        plan_summary = {
+            "interior": {
+                "learning": 0,
+                "generation": 0
+            },
+            "dress_up": {
+                "learning": 0,
+                "generation": 0
+            }
+        }
+
+        # Складываем лимиты по каждому плану
+        for (plan_type, training_limit, generation_limit) in rows:
+            # Если поля None, подставим 0
+            tlim = training_limit if training_limit is not None else 0
+            glim = generation_limit if generation_limit is not None else 0
+
+            plan_summary[plan_type]["learning"] += tlim
+            plan_summary[plan_type]["generation"] += glim
+
+        return plan_summary

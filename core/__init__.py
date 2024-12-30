@@ -1,1 +1,1 @@
-from .config import config, bot, dp, DATABASE_URL, AntiSpamMiddleware
+from .config import config, bot, dp, DATABASE_URL
